@@ -1,0 +1,559 @@
+<title>Agenda Pastoral</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+
+<style>
+/* ── Design tokens ── */
+:root {
+  --bg:        #F7F6F3;
+  --surface:   #FFFFFF;
+  --surface2:  #EEECEA;
+  --fg:        #1A1814;
+  --fg2:       #6B6560;
+  --fg3:       #9B948D;
+  --accent:    #7A4F2F;
+  --accent-lt: #F0E8E0;
+  --gold:      #B8862A;
+  --divider:   #E2DDD8;
+  --card-r:    12px;
+  --shadow:    0 2px 8px rgba(0,0,0,.07);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #18160F;
+    --surface:   #231F16;
+    --surface2:  #2C2820;
+    --fg:        #F0EDE6;
+    --fg2:       #A8A098;
+    --fg3:       #6E6860;
+    --accent:    #D4956A;
+    --accent-lt: #2C201A;
+    --gold:      #D4A84B;
+    --divider:   #322E25;
+    --shadow:    0 2px 8px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+    --bg:        #18160F;
+    --surface:   #231F16;
+    --surface2:  #2C2820;
+    --fg:        #F0EDE6;
+    --fg2:       #A8A098;
+    --fg3:       #6E6860;
+    --accent:    #D4956A;
+    --accent-lt: #2C201A;
+    --gold:      #D4A84B;
+    --divider:   #322E25;
+    --shadow:    0 2px 8px rgba(0,0,0,.3);
+    color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  background: var(--bg);
+  color: var(--fg);
+  min-height: 100%;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+
+.app-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider);
+  box-shadow: var(--shadow);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  z-index: 30;
+  background: var(--surface);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 60px;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.brand-icon {
+  width: 36px; height: 36px;
+  background: var(--accent); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 18px;
+}
+.brand-text { font-family: 'Crimson Pro', Georgia, serif; font-size: 20px; font-weight: 700; color: var(--fg); line-height: 1; }
+.brand-sub { font-size: 10px; color: var(--fg3); text-transform: uppercase; letter-spacing: .08em; margin-top: 1px; }
+
+.search-wrap { flex: 1; max-width: 320px; position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--fg3); pointer-events: none; }
+#search {
+  width: 100%; padding: 8px 10px 8px 34px;
+  border: 1px solid var(--divider); border-radius: 8px;
+  background: var(--surface2); color: var(--fg);
+  font-family: inherit; font-size: 13px; outline: none; transition: border-color .15s;
+}
+#search:focus { border-color: var(--accent); }
+
+.header-actions { display: flex; gap: 8px; flex-shrink: 0; }
+.icon-btn {
+  background: none; border: 1px solid var(--divider); border-radius: 8px;
+  padding: 7px; cursor: pointer; color: var(--fg2);
+  display: flex; align-items: center; transition: background .15s;
+}
+.icon-btn:hover { background: var(--surface2); }
+
+.month-rail-wrap {
+  background: var(--surface);
+  border-bottom: 1px solid var(--divider);
+  overflow-x: auto; scrollbar-width: none;
+}
+.month-rail-wrap::-webkit-scrollbar { display: none; }
+.month-rail {
+  max-width: 1100px; margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  display: flex; gap: 2px;
+}
+.m-btn {
+  flex-shrink: 0; padding: 10px 14px 8px;
+  border: none; background: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 500;
+  color: var(--fg2); border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s; text-align: center; white-space: nowrap;
+}
+.m-btn .m-name { display: block; }
+.m-btn .m-count { display: block; font-size: 10px; color: var(--fg3); margin-top: 1px; font-variant-numeric: tabular-nums; }
+.m-btn:hover { color: var(--fg); }
+.m-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+.m-btn.active .m-count { color: var(--accent); }
+
+.main {
+  max-width: 1100px; margin: 0 auto;
+  padding: 24px max(16px, env(safe-area-inset-left, 0px));
+  padding-bottom: 48px;
+}
+
+/* Loading */
+.loading-state {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 80px 24px; gap: 16px; color: var(--fg3);
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--divider);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-state p { font-size: 14px; }
+
+/* Sync status */
+.sync-bar {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: var(--fg3); margin-bottom: 20px;
+}
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #22c55e; flex-shrink: 0;
+}
+.sync-dot.error { background: #ef4444; }
+.sync-dot.loading { background: var(--gold); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+.sync-time { color: var(--fg3); }
+.refresh-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--accent); font-size: 11px; font-family: inherit;
+  padding: 2px 6px; border-radius: 4px; text-decoration: underline;
+}
+.refresh-btn:hover { color: var(--fg); }
+
+.today-banner {
+  background: var(--accent-lt); border: 1px solid var(--accent);
+  border-radius: var(--card-r); padding: 14px 18px; margin-bottom: 24px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.today-banner[hidden] { display: none !important; }
+.banner-icon { font-size: 22px; flex-shrink: 0; margin-top: 1px; }
+.banner-label { font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+.banner-names { font-family: 'Crimson Pro', Georgia, serif; font-size: 16px; font-weight: 600; color: var(--fg); line-height: 1.4; }
+
+.section-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 20px; }
+.section-title { font-family: 'Crimson Pro', Georgia, serif; font-size: 28px; font-weight: 700; color: var(--fg); text-wrap: balance; }
+.section-count { font-size: 13px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+
+.stats-bar { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.stat { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--divider); border-radius: 8px; padding: 10px 14px; }
+.stat-val { font-family: 'Crimson Pro', Georgia, serif; font-size: 22px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 11px; color: var(--fg3); line-height: 1.2; }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+.card {
+  background: var(--surface); border: 1px solid var(--divider);
+  border-radius: var(--card-r); padding: 16px 18px; box-shadow: var(--shadow);
+  transition: box-shadow .15s, border-color .15s;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); border-color: var(--accent); }
+.card.today-card { border-color: var(--gold); background: linear-gradient(135deg, var(--surface) 80%, var(--accent-lt)); }
+
+.card-top { display: flex; align-items: flex-start; gap: 12px; }
+.avatar {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--accent-lt); color: var(--accent);
+  font-family: 'Crimson Pro', Georgia, serif; font-size: 18px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; border: 1.5px solid var(--accent);
+}
+.card.today-card .avatar { background: var(--gold); color: #fff; border-color: var(--gold); }
+.name-block { min-width: 0; }
+.person-name { font-family: 'Crimson Pro', Georgia, serif; font-size: 16px; font-weight: 600; color: var(--fg); line-height: 1.2; text-wrap: balance; }
+.person-rol { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; font-weight: 500; }
+.birthday-date { margin-left: auto; flex-shrink: 0; text-align: right; }
+.bday-day { font-family: 'Crimson Pro', Georgia, serif; font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; font-variant-numeric: tabular-nums; }
+.bday-monthname { font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--fg3); margin-top: 1px; }
+
+.card-meta { display: flex; flex-direction: column; gap: 6px; }
+.meta-row { display: flex; align-items: center; gap: 7px; color: var(--fg2); font-size: 12.5px; }
+.meta-row svg { flex-shrink: 0; color: var(--fg3); }
+.meta-row span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--divider); }
+.zona-badge { font-size: 11px; font-weight: 600; color: var(--fg3); background: var(--surface2); padding: 3px 8px; border-radius: 20px; }
+.age-badge { font-size: 12px; color: var(--fg3); font-variant-numeric: tabular-nums; }
+.age-num { font-weight: 600; color: var(--fg2); }
+.today-ribbon { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--gold); }
+
+.empty { text-align: center; padding: 64px 24px; color: var(--fg3); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-text { font-size: 15px; }
+
+@media (max-width: 500px) {
+  .brand-sub { display: none; }
+  .section-title { font-size: 22px; }
+  .stats-bar { gap: 10px; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="app-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon">✝</div>
+      <div>
+        <div class="brand-text">Agenda Pastoral</div>
+        <div class="brand-sub">Presbíteros Colombia</div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search" type="search" placeholder="Buscar nombre, municipio o zona…" autocomplete="off">
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" id="refreshBtn" title="Sincronizar con Google Sheets">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+      </button>
+      <button class="icon-btn" id="themeToggle" title="Cambiar tema">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="month-rail-wrap">
+    <div class="month-rail" id="monthRail"></div>
+  </div>
+</div>
+
+<div class="main" id="mainContent">
+  <div class="loading-state" id="loadingState">
+    <div class="spinner"></div>
+    <p>Cargando desde Google Sheets…</p>
+  </div>
+
+  <div id="appContent" hidden>
+    <div id="todayBanner" class="today-banner" hidden>
+      <div class="banner-icon">🎂</div>
+      <div>
+        <div class="banner-label">Cumpleaños hoy</div>
+        <div class="banner-names" id="todayNames"></div>
+      </div>
+    </div>
+
+    <div class="sync-bar" id="syncBar">
+      <span class="sync-dot" id="syncDot"></span>
+      <span id="syncMsg">Conectado a Google Sheets</span>
+      <button class="refresh-btn" id="syncRefresh">Actualizar ahora</button>
+    </div>
+
+    <div class="stats-bar" id="statsBar"></div>
+
+    <div class="section-head">
+      <h2 class="section-title" id="sectionTitle"></h2>
+      <span class="section-count" id="sectionCount"></span>
+    </div>
+
+    <div class="card-grid" id="grid"></div>
+    <div class="empty" id="empty" hidden>
+      <div class="empty-icon">📅</div>
+      <div class="empty-text">No hay registros para este mes.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyv-1AZhxkQUFwJsEPeCZ2ytdD99qYlxfG4qHOD8TuB2cPPfzevbiU9J4swDb2AEQnx/exec';
+
+// Datos embebidos (133 presbíteros) — se usan si el fetch falla
+const DATOS_LOCALES = [{"Zona":"Zona1","Nombres":"Miguel Antonio Linares Garzon","Rol":"Presbitero","Fecha de Nacimiento":"20/11/1976","Celular":"3125803984","Municipio":"BOGOTA D.C."},{"Zona":"Zona2","Nombres":"Eladio Uribe Diaz","Rol":"Presbitero","Fecha de Nacimiento":"05/10/1980","Celular":"3108100093","Municipio":"BUCARAMANGA"},{"Zona":"Zona3","Nombres":"Ramiro Chaparro Salcedo","Rol":"Presbitero","Fecha de Nacimiento":"13/01/1965","Celular":"3184939319","Municipio":"BARRANCABERMEJA"},{"Zona":"Zona4","Nombres":"Pedro Ovidio Diaz Velasquez","Rol":"Presbitero","Fecha de Nacimiento":"24/06/1962","Celular":"3115836887","Municipio":"VILLAVICENCIO"},{"Zona":"Zona5","Nombres":"Luis Eider Garzon Lizcano","Rol":"Presbitero","Fecha de Nacimiento":"14/11/1982","Celular":"3219734227","Municipio":"FLORENCIA"},{"Zona":"Zona6","Nombres":"Leonardo Fabio Herrera Lopez","Rol":"Presbitero","Fecha de Nacimiento":"10/12/1981","Celular":"3166027950","Municipio":"VILLA DEL ROSARIO"},{"Zona":"Zona7","Nombres":"Edilberto Quintero Navarro","Rol":"Presbitero","Fecha de Nacimiento":"19/04/1971","Celular":"3014378258","Municipio":"BARRANQUILLA"},{"Zona":"Zona8","Nombres":"Jhon Fredy Padilla Guerra","Rol":"Presbitero","Fecha de Nacimiento":"24/11/1977","Celular":"3102642485","Municipio":"ENVIGADO"},{"Zona":"Zona9","Nombres":"Julio Humberto Blanquicett Gonzalez","Rol":"Presbitero","Fecha de Nacimiento":"06/09/1972","Celular":"3007738892","Municipio":"NEIVA"},{"Zona":"Zona10","Nombres":"Jorge Martinez Dueñas","Rol":"Presbitero","Fecha de Nacimiento":"16/06/1974","Celular":"3219027117","Municipio":"OIBA"},{"Zona":"Zona11","Nombres":"Jose Libardo Llanten Rivera","Rol":"Presbitero","Fecha de Nacimiento":"28/07/1967","Celular":"3203291053","Municipio":"POPAYAN"},{"Zona":"Zona12","Nombres":"Jair Avilés Calderón","Rol":"Presbitero","Fecha de Nacimiento":"19/07/1977","Celular":"3138724080","Municipio":"PEREIRA"},{"Zona":"Zona13","Nombres":"Fernando Castrillon Galvis","Rol":"Presbitero","Fecha de Nacimiento":"25/11/1962","Celular":"3216421613","Municipio":"ARAUCA"},{"Zona":"Zona14","Nombres":"Estibenson Mendoza Campo","Rol":"Presbitero","Fecha de Nacimiento":"05/10/1981","Celular":"3162942450","Municipio":"AGUACHICA"},{"Zona":"Zona15","Nombres":"Ferneiro Alonso García","Rol":"Presbitero","Fecha de Nacimiento":"25/12/1978","Celular":"3208352472","Municipio":"YOPAL"},{"Zona":"Zona16","Nombres":"Josue Martinez Vargas","Rol":"Presbitero","Fecha de Nacimiento":"08/12/1976","Celular":"3125002158","Municipio":"SAN JOSE DEL GUAVIARE"},{"Zona":"Zona17","Nombres":"Juan Pablo Oviedo Sepulveda","Rol":"Presbitero","Fecha de Nacimiento":"28/02/1979","Celular":"3118992167","Municipio":"CALI"},{"Zona":"Zona18","Nombres":"Marco Fidel Bernal Sierra","Rol":"Presbitero","Fecha de Nacimiento":"23/06/1979","Celular":"3213557985","Municipio":"FUNZA"},{"Zona":"Zona19","Nombres":"Alexander Rosado","Rol":"Presbitero","Fecha de Nacimiento":"20/05/1975","Celular":"3014886308","Municipio":"MONTERIA"},{"Zona":"Zona20","Nombres":"Oscar Mauricio Buenahora Rodriguez","Rol":"Presbitero","Fecha de Nacimiento":"21/07/1971","Celular":"3105861493","Municipio":"GIRON"},{"Zona":"Zona21","Nombres":"Luis Eduardo Arrollo Grijalba","Rol":"Presbitero","Fecha de Nacimiento":"13/12/1986","Celular":"3102211498","Municipio":"PUERTO CARREÑO"},{"Zona":"Zona22","Nombres":"Juan Carlos Hernandez Rodriguez","Rol":"Presbitero","Fecha de Nacimiento":"15/09/1968","Celular":"3142611245","Municipio":"MALAGA"},{"Zona":"Zona23","Nombres":"Fauricio Paolo Sanchez Gomez","Rol":"Presbitero","Fecha de Nacimiento":"27/09/1982","Celular":"3133953969","Municipio":"LETICIA"},{"Zona":"Zona24","Nombres":"David Antonio Quintero Martinez","Rol":"Presbitero","Fecha de Nacimiento":"26/04/1973","Celular":"3137028567","Municipio":"PASTO"},{"Zona":"Zona25","Nombres":"Jose Bernardo Luligo Lemus","Rol":"Presbitero","Fecha de Nacimiento":"29/12/1975","Celular":"3118515561","Municipio":"PITALITO"},{"Zona":"Zona26","Nombres":"Jafet Murillo Gonzalez","Rol":"Presbitero","Fecha de Nacimiento":"20/12/1971","Celular":"3168436850","Municipio":"SINCELEJO"},{"Zona":"Zona27","Nombres":"Jose David Gonzalez Cabrera","Rol":"Presbitero","Fecha de Nacimiento":"24/04/1970","Celular":"3213396371","Municipio":"SOGAMOSO"},{"Zona":"Zona28","Nombres":"Edio Fanid Rodriguez","Rol":"Presbitero","Fecha de Nacimiento":"30/05/1976","Celular":"3125944727","Municipio":"IBAGUE"},{"Zona":"Zona29","Nombres":"Gerardo Ordoñez Bautista","Rol":"Presbitero","Fecha de Nacimiento":"04/09/1968","Celular":"3229456693","Municipio":"EL ZULIA"},{"Zona":"Zona30","Nombres":"Jhon Rafael Alvarez Moreno","Rol":"Presbitero","Fecha de Nacimiento":"26/11/1971","Celular":"3104099219","Municipio":"QUIBDO"},{"Zona":"Zona31","Nombres":"Gerardo Miye Herazo Hoyos","Rol":"Presbitero","Fecha de Nacimiento":"25/02/1983","Celular":"3117364356","Municipio":"REMEDIOS"},{"Zona":"Zona32","Nombres":"Heli Cuadros Esteban","Rol":"Presbitero","Fecha de Nacimiento":"26/02/1962","Celular":"3103806370","Municipio":"PALMIRA"},{"Zona":"Zona33","Nombres":"Javier Riascos Vargas","Rol":"Presbitero","Fecha de Nacimiento":"28/05/1978","Celular":"3137933420","Municipio":"EL DOVIO"},{"Zona":"Zona34","Nombres":"Hector Fabio Aragon Castro","Rol":"Presbitero","Fecha de Nacimiento":"23/09/1970","Celular":"3136692029","Municipio":"BUENAVENTURA"},{"Zona":"Zona35","Nombres":"Wilman Tique Ortiz","Rol":"Presbitero","Fecha de Nacimiento":"23/10/1979","Celular":"3186302613","Municipio":"BOGOTA D.C."},{"Zona":"Zona36","Nombres":"Robinson Grimaldo Passo","Rol":"Presbitero","Fecha de Nacimiento":"27/12/1977","Celular":"3155473845","Municipio":"SAN ALBERTO"},{"Zona":"Zona37","Nombres":"Juan De Jesus Lozano Moreno","Rol":"Presbitero","Fecha de Nacimiento":"20/10/1975","Celular":"3172786645","Municipio":"SAN VICENTE DE CHUCURI"},{"Zona":"Zona38","Nombres":"Habid Centeno Centeno","Rol":"Presbitero","Fecha de Nacimiento":"06/01/1972","Celular":"3213722844","Municipio":"BARRANCABERMEJA"},{"Zona":"Zona39","Nombres":"Jesus Bolivar Solis Cuero","Rol":"Presbitero","Fecha de Nacimiento":"24/09/1970","Celular":"3136151733","Municipio":"SOACHA"},{"Zona":"Zona40","Nombres":"Mauricio Valencia Villamizar","Rol":"Presbitero","Fecha de Nacimiento":"18/05/1981","Celular":"3204598711","Municipio":"CASTILLA LA NUEVA"},{"Zona":"Zona41","Nombres":"Mario Montenegro Sanchez","Rol":"Presbitero","Fecha de Nacimiento":"26/09/1961","Celular":"3124821189","Municipio":"PARATEBUENO"},{"Zona":"Zona42","Nombres":"Stivinson Suarez Londoño","Rol":"Presbitero","Fecha de Nacimiento":"13/10/1985","Celular":"3132839941","Municipio":"PUERTO LOPEZ"},{"Zona":"Zona43","Nombres":"Miller Castillo Serrano","Rol":"Presbitero","Fecha de Nacimiento":"01/03/1977","Celular":"3232907196","Municipio":"SAN VICENTE DEL CAGUAN"},{"Zona":"Zona44","Nombres":"Edwin Julio Villalobos","Rol":"Presbitero","Fecha de Nacimiento":"13/03/1976","Celular":"3017869625","Municipio":"MAICAO"},{"Zona":"Zona45","Nombres":"Heydi Nelson Atehortua Ramirez","Rol":"Presbitero","Fecha de Nacimiento":"01/09/1978","Celular":"3127126495","Municipio":"CARTAGENA"},{"Zona":"Zona46","Nombres":"Luis Fernando Ramirez Pino","Rol":"Presbitero","Fecha de Nacimiento":"30/03/1966","Celular":"3105955892","Municipio":"SANTA MARTA"},{"Zona":"Zona47","Nombres":"John Victor Rocha Rojas","Rol":"Presbitero","Fecha de Nacimiento":"02/10/1973","Celular":"3212273100","Municipio":"PUERTO BOYACA"},{"Zona":"Zona48","Nombres":"Jailson De Jesus Barragan Leguia","Rol":"Presbitero","Fecha de Nacimiento":"15/04/1975","Celular":"3103779980","Municipio":"CAUCASIA"},{"Zona":"Zona49","Nombres":"Abel Rangel Barrera","Rol":"Presbitero","Fecha de Nacimiento":"06/10/1979","Celular":"3207587992","Municipio":"ANDES"},{"Zona":"Zona50","Nombres":"Santiago Alexander Carvajal Rivera","Rol":"Presbitero","Fecha de Nacimiento":"02/04/1976","Celular":"3175508335","Municipio":"APARTADO"},{"Zona":"Zona51","Nombres":"Juan Diaz Banguera","Rol":"Presbitero","Fecha de Nacimiento":"07/01/1967","Celular":"3186853062","Municipio":"SANTANDER DE QUILICHAO"},{"Zona":"Zona52","Nombres":"Jose Jair Valencia Valencia","Rol":"Presbitero","Fecha de Nacimiento":"07/11/1979","Celular":"3122991655","Municipio":"TIMBIO"},{"Zona":"Zona53","Nombres":"Hebert Epe Fajardo","Rol":"Presbitero","Fecha de Nacimiento":"25/01/1966","Celular":"3183192685","Municipio":"EL TAMBO"},{"Zona":"Zona54","Nombres":"Jhony Clemente Gamez Nuñez","Rol":"Presbitero","Fecha de Nacimiento":"20/05/1974","Celular":"3107407021","Municipio":"VALLEDUPAR"},{"Zona":"Zona55","Nombres":"Leonel De Jesus Henao Calvo","Rol":"Presbitero","Fecha de Nacimiento":"11/08/1969","Celular":"3123782263","Municipio":"GUASCA"},{"Zona":"Zona56","Nombres":"Lino Antonio Caldon Pizo","Rol":"Presbitero","Fecha de Nacimiento":"12/04/1978","Celular":"3203160614","Municipio":"VILLAGARZON"},{"Zona":"Zona57","Nombres":"Arturo Angarita Camargo","Rol":"Presbitero","Fecha de Nacimiento":"11/12/1966","Celular":"3173172165","Municipio":"FLORIDABLANCA"},{"Zona":"Zona58","Nombres":"Adalberto De Jesus Villegas Velasquez","Rol":"Presbitero","Fecha de Nacimiento":"19/06/1967","Celular":"3202724495","Municipio":"CURRILLO"},{"Zona":"Zona59","Nombres":"Ciro Osorio Galviz","Rol":"Presbitero","Fecha de Nacimiento":"11/03/1972","Celular":"3142545799","Municipio":"PAMPLONA"},{"Zona":"Zona60","Nombres":"Edelso Reyes Pedroso","Rol":"Presbitero","Fecha de Nacimiento":"29/04/1961","Celular":"3043517461","Municipio":"EL BANCO"},{"Zona":"Zona61","Nombres":"Orlando Narvaez Tintinago","Rol":"Presbitero","Fecha de Nacimiento":"01/04/1970","Celular":"3202420831","Municipio":"PURACE"},{"Zona":"Zona62","Nombres":"Estany Wilson Argumedo Diaz","Rol":"Presbitero","Fecha de Nacimiento":"10/10/1975","Celular":"3135599525","Municipio":"MAGANGUE"},{"Zona":"Zona63","Nombres":"Jairo Alberto Vasquez Vasquez","Rol":"Presbitero","Fecha de Nacimiento":"29/04/1980","Celular":"3148005673","Municipio":"ARMENIA QUINDIO"},{"Zona":"Zona64","Nombres":"Ferley Lobaton Pulgarin","Rol":"Presbitero","Fecha de Nacimiento":"14/03/1978","Celular":"3108774664","Municipio":"MANIZALES"},{"Zona":"Zona65","Nombres":"Dionisio Manuel Vergara Bernal","Rol":"Presbitero","Fecha de Nacimiento":"24/10/1980","Celular":"3128182168","Municipio":"CURUMANI"},{"Zona":"Zona66","Nombres":"Alvaro Jesús Niño Garzon","Rol":"Presbitero","Fecha de Nacimiento":"20/12/1977","Celular":"3148075506","Municipio":"TOCANCIPA"},{"Zona":"Zona67","Nombres":"Carlos Andres Marulanda Castro","Rol":"Presbitero","Fecha de Nacimiento":"19/07/1976","Celular":"3204944296","Municipio":"GARZON"},{"Zona":"Zona68","Nombres":"Nery Ornol Trujillo Palomino","Rol":"Presbitero","Fecha de Nacimiento":"19/10/1961","Celular":"3103086540","Municipio":"CARTAGENA DEL CHAIRA"},{"Zona":"Zona69","Nombres":"Alberto Izaziga Miraña","Rol":"Presbitero","Fecha de Nacimiento":"24/11/1967","Celular":"3118022059","Municipio":"MILAN"},{"Zona":"Zona70","Nombres":"Isauro Sanabria Valbuena","Rol":"Presbitero","Fecha de Nacimiento":"08/06/1968","Celular":"3138536701","Municipio":"VILLA DEL ROSARIO"},{"Zona":"Zona71","Nombres":"Ricardo Rodriguez Niño","Rol":"Presbitero","Fecha de Nacimiento":"04/11/1971","Celular":"3167635892","Municipio":"BARBOSA SANTANDER"},{"Zona":"Zona72","Nombres":"William Cortes","Rol":"Presbitero","Fecha de Nacimiento":"15/10/1974","Celular":"3146875444","Municipio":"TUMACO"},{"Zona":"Zona73","Nombres":"Enan Enrique Chaljub Miranda","Rol":"Presbitero","Fecha de Nacimiento":"27/12/1976","Celular":"3004926035","Municipio":"LORICA"},{"Zona":"Zona74","Nombres":"Arnulfo Lozano Arevalo","Rol":"Presbitero","Fecha de Nacimiento":"09/10/1968","Celular":"3227887217","Municipio":"PUERTO LEGUIZAMO"},{"Zona":"Zona75","Nombres":"Mario Medina","Rol":"Presbitero","Fecha de Nacimiento":"20/10/1968","Celular":"3187433716","Municipio":"LOPEZ"},{"Zona":"Zona76","Nombres":"Mauricio Jose Jimenez Rincon","Rol":"Presbitero","Fecha de Nacimiento":"23/05/1979","Celular":"3002094279","Municipio":"SABANALARGA ATLANTICO"},{"Zona":"Zona77","Nombres":"Juan Isidro Fuentes","Rol":"Presbitero","Fecha de Nacimiento":"02/01/1965","Celular":"3102297612","Municipio":"MONTERREY"},{"Zona":"Zona78","Nombres":"Alfredo Sierra Bernal","Rol":"Presbitero","Fecha de Nacimiento":"11/10/1973","Celular":"3227948057","Municipio":"TIBU"},{"Zona":"Zona79","Nombres":"Simeon Caicedo Castaño","Rol":"Presbitero","Fecha de Nacimiento":"07/10/1966","Celular":"3208189807","Municipio":"NEIVA"},{"Zona":"Zona80","Nombres":"John Fredy Gonzalez Marin","Rol":"Presbitero","Fecha de Nacimiento":"11/08/1983","Celular":"3133271034","Municipio":"VILLANUEVA"},{"Zona":"Zona81","Nombres":"Eduard Sanchez Mosquera","Rol":"Presbitero","Fecha de Nacimiento":"31/07/1978","Celular":"3138926115","Municipio":"MITU"},{"Zona":"Zona82","Nombres":"Eloeiter Quintana Suarez","Rol":"Presbitero","Fecha de Nacimiento":"16/10/1983","Celular":"3114285988","Municipio":"ORTEGA"},{"Zona":"Zona83","Nombres":"Isahac Montenegro Rincon","Rol":"Presbitero","Fecha de Nacimiento":"12/02/1980","Celular":"3144219959","Municipio":"EL DONCELLO"},{"Zona":"Zona84","Nombres":"Auter Hugo Castro Cabezas","Rol":"Presbitero","Fecha de Nacimiento":"11/05/1967","Celular":"3116044383","Municipio":"PELAYA"},{"Zona":"Zona85","Nombres":"Rito Antonio Morera Quinchicua","Rol":"Presbitero","Fecha de Nacimiento":"01/02/1978","Celular":"3102604443","Municipio":"PUERTO RICO"},{"Zona":"Zona86","Nombres":"Dubaniel Moreno Cordoba","Rol":"Presbitero","Fecha de Nacimiento":"28/11/1979","Celular":"3206334247","Municipio":"OCAÑA"},{"Zona":"Zona87","Nombres":"Adan Muñoz Fajardo","Rol":"Presbitero","Fecha de Nacimiento":"12/09/1982","Celular":"3122195203","Municipio":"BARRANCAS"},{"Zona":"Zona88","Nombres":"Wilson Morales Restrepo","Rol":"Presbitero","Fecha de Nacimiento":"08/07/1976","Celular":"3115325318","Municipio":"CUMARIBO"},{"Zona":"Zona89","Nombres":"Deison Gaviria Bolaños","Rol":"Presbitero","Fecha de Nacimiento":"24/09/1981","Celular":"3185029830","Municipio":"LA UNION"},{"Zona":"Zona90","Nombres":"Juan Evangelista Riascos Riascos","Rol":"Presbitero","Fecha de Nacimiento":"03/07/1972","Celular":"3127780372","Municipio":"SAN PABLO"},{"Zona":"Zona91","Nombres":"Severiano Pinzon Peña","Rol":"Presbitero","Fecha de Nacimiento":"06/01/1979","Celular":"3144031448","Municipio":"INIRIDA"},{"Zona":"Zona92","Nombres":"Jhon Jairo Higuita Alcaraz","Rol":"Presbitero","Fecha de Nacimiento":"20/08/1967","Celular":"3104604816","Municipio":"RIONEGRO"},{"Zona":"Zona93","Nombres":"Hugo Alberto Marin Acevedo","Rol":"Presbitero","Fecha de Nacimiento":"24/07/1969","Celular":"3127816920","Municipio":"FORTUL"},{"Zona":"Zona94","Nombres":"Bricenio Londoño Longa","Rol":"Presbitero","Fecha de Nacimiento":"13/12/1975","Celular":"3206759686","Municipio":"CONDOTO"},{"Zona":"Zona95","Nombres":"Florentino Sandoval Gualtero","Rol":"Presbitero","Fecha de Nacimiento":"27/09/1973","Celular":"3108013502","Municipio":"CUCUTA"},{"Zona":"Zona96","Nombres":"Gumercindo Serge Uribe","Rol":"Presbitero","Fecha de Nacimiento":"31/05/1970","Celular":"3145373061","Municipio":"BELLO"},{"Zona":"Zona97","Nombres":"Samuel David Martinez Vargas","Rol":"Presbitero","Fecha de Nacimiento":"17/11/1976","Celular":"3133022211","Municipio":"ITAGÜI"},{"Zona":"Zona98","Nombres":"Manzur Jacome Lopez","Rol":"Presbitero","Fecha de Nacimiento":"15/11/1974","Celular":"3106510266","Municipio":"MAJAGUAL"},{"Zona":"Zona99","Nombres":"Leonel Cordoba Barrera","Rol":"Presbitero","Fecha de Nacimiento":"12/11/1977","Celular":"3132195395","Municipio":"PALERMO"},{"Zona":"Zona100","Nombres":"Wilmar Alberto Carrillo Casas","Rol":"Presbitero","Fecha de Nacimiento":"05/08/1983","Celular":"3125169704","Municipio":"GRANADA"},{"Zona":"Zona101","Nombres":"Jorge Andres Mosquera Flor","Rol":"Presbitero","Fecha de Nacimiento":"27/08/1980","Celular":"3113351438","Municipio":"VILLA RICA"},{"Zona":"Zona102","Nombres":"Juan Fernando Urrea Montoya","Rol":"Presbitero","Fecha de Nacimiento":"21/10/1979","Celular":"3146148803","Municipio":"AMALFI"},{"Zona":"Zona103","Nombres":"Casimiro Arenas Hernandez","Rol":"Presbitero","Fecha de Nacimiento":"04/03/1957","Celular":"3152152815","Municipio":"BUCARAMANGA"},{"Zona":"Zona104","Nombres":"Mauricio Lopez Posso","Rol":"Presbitero","Fecha de Nacimiento":"18/06/1975","Celular":"3148260227","Municipio":"CALI"},{"Zona":"Zona105","Nombres":"Jose Uriel Buitrago Arcila","Rol":"Presbitero","Fecha de Nacimiento":"11/07/1972","Celular":"3115345340","Municipio":"FUSAGASUGA"},{"Zona":"Zona106","Nombres":"Edgar Castañeda Paez","Rol":"Presbitero","Fecha de Nacimiento":"15/09/1988","Celular":"3229473445","Municipio":"SUTAMARCHAN"},{"Zona":"Zona107","Nombres":"Segundo Angel Angulo Quiñones","Rol":"Presbitero","Fecha de Nacimiento":"20/03/1973","Celular":"3132864710","Municipio":"BOGOTA D.C."},{"Zona":"Zona108","Nombres":"Jose Abelardo Suarez","Rol":"Presbitero","Fecha de Nacimiento":"01/05/1963","Celular":"3213129508","Municipio":"BOGOTA D.C."},{"Zona":"Zona109","Nombres":"Abelardo Pineda Acosta","Rol":"Presbitero","Fecha de Nacimiento":"15/01/1978","Celular":"3166992245","Municipio":"PUERTO GAITAN"},{"Zona":"Zona110","Nombres":"Raul Alfonso Bejarano Mendez","Rol":"Presbitero","Fecha de Nacimiento":"28/06/1972","Celular":"3118129868","Municipio":"VILLAVICENCIO"},{"Zona":"Zona111","Nombres":"Jonathan Vanegas Arenas","Rol":"Presbitero","Fecha de Nacimiento":"15/09/1982","Celular":"3013450766","Municipio":"MEDELLIN"},{"Zona":"Zona112","Nombres":"Jeiber Valencia Sanchez","Rol":"Presbitero","Fecha de Nacimiento":"12/05/1982","Celular":"3122731534","Municipio":"PIENDAMO"},{"Zona":"Zona113","Nombres":"Carlos Fabian Rivera Alzate","Rol":"Presbitero","Fecha de Nacimiento":"21/03/1975","Celular":"3206269479","Municipio":"VITERBO"},{"Zona":"Zona114","Nombres":"Jairo Luis Romero Ortega","Rol":"Presbitero","Fecha de Nacimiento":"30/09/1981","Celular":"3148773643","Municipio":"MONTERIA"},{"Zona":"Zona115","Nombres":"Marlo Gregorio Campos Menco","Rol":"Presbitero","Fecha de Nacimiento":"24/09/1972","Celular":"3163019980","Municipio":"EL CARMEN DE BOLIVAR"},{"Zona":"Zona116","Nombres":"Jose Del Carmen Gomez","Rol":"Presbitero","Fecha de Nacimiento":"19/04/1957","Celular":"3115745146","Municipio":"LIBANO"},{"Zona":"Zona117","Nombres":"Vilmar Antonio Renteria Garcia","Rol":"Presbitero","Fecha de Nacimiento":"08/01/1982","Celular":"3122737122","Municipio":"QUIBDO"},{"Zona":"Zona118","Nombres":"Gedeon Miranda","Rol":"Presbitero","Fecha de Nacimiento":"25/03/1964","Celular":"3113582785","Municipio":"TULUA"},{"Zona":"Zona119","Nombres":"Eliecer Enrique Romero Gonzalez","Rol":"Presbitero","Fecha de Nacimiento":"11/03/1979","Celular":"3202727172","Municipio":"CIMITARRA"},{"Zona":"Zona120","Nombres":"Carlos Arturo Mancilla Mera","Rol":"Presbitero","Fecha de Nacimiento":"10/03/1975","Celular":"3113457024","Municipio":"BUENOS AIRES"},{"Zona":"Zona121","Nombres":"Elias Ballesteros Rubio","Rol":"Presbitero","Fecha de Nacimiento":"08/09/1973","Celular":"3125471932","Municipio":"SOLITA"},{"Zona":"Zona122","Nombres":"Luis Javier Larrea Cartagena","Rol":"Presbitero","Fecha de Nacimiento":"04/04/1976","Celular":"3148793327","Municipio":"ZIPAQUIRA"},{"Zona":"Zona123","Nombres":"David Hernando Vidales Cantillo","Rol":"Presbitero","Fecha de Nacimiento":"24/08/1977","Celular":"3024053903","Municipio":"MALAMBO"},{"Zona":"Zona124","Nombres":"Misael Ramirez Navarro","Rol":"Presbitero","Fecha de Nacimiento":"17/02/1975","Celular":"3133094525","Municipio":"ALGECIRAS"},{"Zona":"Zona125","Nombres":"Wilson Quintero Alvarez","Rol":"Presbitero","Fecha de Nacimiento":"03/11/1978","Celular":"3177665005","Municipio":"SAN GIL"},{"Zona":"Zona126","Nombres":"Daniel Florez Andrade","Rol":"Presbitero","Fecha de Nacimiento":"30/09/1966","Celular":"3205372690","Municipio":"TAME"},{"Zona":"Zona127","Nombres":"Onasis Mendivelso Cisneros","Rol":"Presbitero","Fecha de Nacimiento":"20/02/1975","Celular":"3118773336","Municipio":"TRINIDAD"},{"Zona":"Zona128","Nombres":"Esteban Chicue Muñoz","Rol":"Presbitero","Fecha de Nacimiento":"02/09/1969","Celular":"3124375688","Municipio":"ISNOS"},{"Zona":"Zona129","Nombres":"Carlos Eduardo Ardila Medina","Rol":"Presbitero","Fecha de Nacimiento":"13/04/1978","Celular":"3112843791","Municipio":"RIOSUCIO CALDAS"},{"Zona":"Zona130","Nombres":"Vladimir Burgos Medina","Rol":"Presbitero","Fecha de Nacimiento":"14/12/1976","Celular":"3107813549","Municipio":"CUCUTA"},{"Zona":"Zona131","Nombres":"Luis Ignacio Lozano Galindo","Rol":"Presbitero","Fecha de Nacimiento":"24/07/1967","Celular":"3123917230","Municipio":"RESTREPO"},{"Zona":"Zona132","Nombres":"Edgar Mosquera Audivert","Rol":"Presbitero","Fecha de Nacimiento":"29/03/1969","Celular":"3145720881","Municipio":"ARJONA"},{"Zona":"Zona133","Nombres":"Wilminton Mosquera Cordoba","Rol":"Presbitero","Fecha de Nacimiento":"03/10/1973","Celular":"3233302557","Municipio":"ISTMINA"}];
+const MONTHS = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const MONTHS_SHORT = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
+
+let DATA = [];
+const now = new Date();
+let activeMonth = now.getMonth() + 1;
+let searchQuery = '';
+
+// Theme
+function initTheme() {
+  try { const t = localStorage.getItem('agenda-theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch(e){}
+}
+initTheme();
+document.getElementById('themeToggle').addEventListener('click', () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  try { localStorage.setItem('agenda-theme', next); } catch(e){}
+});
+
+// CSV parsing
+function parseCSVLine(line) {
+  const cols = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { cols.push(cur.trim().replace(/^"|"$/g,'')); cur = ''; }
+    else { cur += c; }
+  }
+  cols.push(cur.trim().replace(/^"|"$/g,''));
+  return cols;
+}
+
+function parseDate(val) {
+  if (!val) return { dia: null, mes: null, anio: null };
+  val = val.trim();
+  let m;
+  // dd/mm/yyyy or dd-mm-yyyy
+  m = val.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m) return { dia: +m[1], mes: +m[2], anio: +m[3] };
+  // yyyy-mm-dd
+  m = val.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return { dia: +m[3], mes: +m[2], anio: +m[1] };
+  // Excel serial number
+  const n = parseInt(val);
+  if (!isNaN(n) && n > 10000 && n < 60000) {
+    const adj = n >= 60 ? n - 1 : n;
+    const d = new Date(Date.UTC(1899, 11, 31) + adj * 86400000);
+    return { dia: d.getUTCDate(), mes: d.getUTCMonth() + 1, anio: d.getUTCFullYear() };
+  }
+  return { dia: null, mes: null, anio: null };
+}
+
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById('syncDot');
+  const msgEl = document.getElementById('syncMsg');
+  dot.className = 'sync-dot' + (state === 'ok' ? '' : state === 'error' ? ' error' : ' loading');
+  msgEl.textContent = msg;
+}
+
+function parseRows(rows) {
+  const parsed = [];
+  for (const row of rows) {
+    const zona = row['Zona'] || '';
+    const nombre = row['Nombres'] || '';
+    const rol = row['Rol'] || '';
+    const fnac = row['Fecha de Nacimiento'] || '';
+    const celular = String(row['Celular'] || '').replace(/\D/g,'');
+    const municipio = row['Municipio'] || '';
+    if (!nombre) continue;
+    const { dia, mes, anio } = parseDate(String(fnac));
+    parsed.push({ zona, nombre, rol, celular, municipio, dia, mes, anio });
+  }
+  return parsed;
+}
+
+async function loadData() {
+  setSyncStatus('loading', 'Cargando datos…');
+  document.getElementById('refreshBtn').disabled = true;
+
+  // Siempre mostrar datos locales inmediatamente
+  if (DATA.length === 0) {
+    DATA = parseRows(DATOS_LOCALES);
+    document.getElementById('loadingState').hidden = true;
+    document.getElementById('appContent').hidden = false;
+    buildRail(); renderTodayBanner(); render(); scrollActiveMonth();
+  }
+
+  // Intentar sincronizar con Google Sheets en segundo plano
+  try {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now(), { signal: ctrl.signal });
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await res.json();
+    const parsed = parseRows(rows);
+    if (parsed.length === 0) throw new Error('Sin datos');
+    DATA = parsed;
+    const t = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+    setSyncStatus('ok', `Conectado · ${DATA.length} registros · Actualizado ${t}`);
+    document.getElementById('loadingState').hidden = true;
+    document.getElementById('appContent').hidden = false;
+    buildRail();
+    renderTodayBanner();
+    render();
+    scrollActiveMonth();
+  } catch(e) {
+    const t = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+    setSyncStatus('ok', `Datos locales · ${DATA.length} registros · ${t} (sin conexión a Sheets)`);
+  }
+  document.getElementById('refreshBtn').disabled = false;
+}
+
+document.getElementById('refreshBtn').addEventListener('click', loadData);
+document.getElementById('syncRefresh').addEventListener('click', loadData);
+
+// Rail
+function buildRail() {
+  const rail = document.getElementById('monthRail');
+  rail.innerHTML = '';
+  for (let m = 1; m <= 12; m++) {
+    const count = DATA.filter(p => p.mes === m).length;
+    const btn = document.createElement('button');
+    btn.className = 'm-btn' + (m === activeMonth ? ' active' : '');
+    btn.innerHTML = `<span class="m-name">${MONTHS_SHORT[m-1]}</span><span class="m-count">${count}</span>`;
+    btn.addEventListener('click', () => { activeMonth = m; searchQuery = ''; document.getElementById('search').value = ''; render(); updateRail(); });
+    rail.appendChild(btn);
+  }
+}
+function updateRail() {
+  document.querySelectorAll('.m-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i + 1 === activeMonth && !searchQuery);
+  });
+}
+
+function renderTodayBanner() {
+  const todayDay = now.getDate(), todayMes = now.getMonth() + 1;
+  const todayPeople = DATA.filter(p => p.dia === todayDay && p.mes === todayMes);
+  const banner = document.getElementById('todayBanner');
+  banner.hidden = todayPeople.length === 0;
+  if (todayPeople.length > 0)
+    document.getElementById('todayNames').textContent = todayPeople.map(p => p.nombre).join(' · ');
+}
+
+function initials(name) {
+  return name.split(' ').slice(0,2).map(w => w[0] || '').join('').toUpperCase();
+}
+
+function renderCard(p) {
+  const todayDay = now.getDate(), todayMes = now.getMonth() + 1;
+  const isToday = p.dia === todayDay && p.mes === todayMes;
+  const age = now.getFullYear() - p.anio;
+  const div = document.createElement('div');
+  div.className = 'card' + (isToday ? ' today-card' : '');
+  div.innerHTML = `
+    <div class="card-top">
+      <div class="avatar">${initials(p.nombre)}</div>
+      <div class="name-block">
+        <div class="person-name">${p.nombre}</div>
+        <div class="person-rol">${p.rol}</div>
+      </div>
+      <div class="birthday-date">
+        <div class="bday-day">${p.dia || '—'}</div>
+        <div class="bday-monthname">${p.mes ? MONTHS_SHORT[p.mes-1] : ''}</div>
+      </div>
+    </div>
+    <div class="card-meta">
+      <div class="meta-row">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span>${p.municipio}</span>
+      </div>
+      <div class="meta-row">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3.07-8.67 2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        <span>${p.celular || '—'}</span>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="zona-badge">${p.zona}</span>
+      ${isToday
+        ? `<span class="today-ribbon">🎂 ¡Hoy!</span>`
+        : `<span class="age-badge">Cumple <span class="age-num">${p.anio ? age : '—'}</span> años</span>`}
+    </div>`;
+  return div;
+}
+
+function getFiltered() {
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    return DATA.filter(p =>
+      p.nombre.toLowerCase().includes(q) ||
+      p.municipio.toLowerCase().includes(q) ||
+      p.zona.toLowerCase().includes(q)
+    ).sort((a,b) => (a.mes - b.mes) || (a.dia - b.dia));
+  }
+  return DATA.filter(p => p.mes === activeMonth).sort((a,b) => a.dia - b.dia);
+}
+
+function renderStats(list) {
+  const bar = document.getElementById('statsBar');
+  if (searchQuery) { bar.innerHTML = ''; return; }
+  const nextUp = list.filter(p => {
+    const bday = new Date(now.getFullYear(), p.mes - 1, p.dia);
+    return bday >= now;
+  });
+  bar.innerHTML = `
+    <div class="stat"><div class="stat-val">${list.length}</div><div class="stat-label">Presbíteros<br>este mes</div></div>
+    <div class="stat"><div class="stat-val">${nextUp.length}</div><div class="stat-label">Próximos<br>cumpleaños</div></div>
+    <div class="stat"><div class="stat-val">${DATA.length}</div><div class="stat-label">Total en<br>registro</div></div>`;
+}
+
+function render() {
+  updateRail();
+  const list = getFiltered();
+  document.getElementById('sectionTitle').textContent = searchQuery ? 'Resultados' : MONTHS[activeMonth-1];
+  document.getElementById('sectionCount').textContent = `${list.length} presbítero${list.length !== 1 ? 's' : ''}`;
+  renderStats(list);
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  document.getElementById('empty').hidden = list.length > 0;
+  list.forEach(p => grid.appendChild(renderCard(p)));
+}
+
+document.getElementById('search').addEventListener('input', e => {
+  searchQuery = e.target.value.trim();
+  render();
+});
+
+function scrollActiveMonth() {
+  const btns = document.querySelectorAll('.m-btn');
+  if (btns[activeMonth-1]) btns[activeMonth-1].scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
+}
+
+loadData();
+</script>
